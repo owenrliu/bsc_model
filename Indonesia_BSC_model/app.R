@@ -13,11 +13,12 @@ ui <- shinyUI(fluidPage(
    
    # Application title
    titlePanel("Policy Impacts on Indonesia's Blue Swimming Crab Fishery"),
-   fluidRow(h3("Product of UCSB and MMAF Indonesia Partnership")),
+   fluidRow(column(8,h3("Product of UCSB and MMAF Indonesia Partnership"))),
    
-   # Sidebar with a slider input for number of bins 
+   
    fluidRow(
       column(3,
+        # Inputs
         wellPanel(
           checkboxInput("sizelimit",label="Size Limit?",value=FALSE),
           sliderInput("size",label="Size Limit (mm)",min=50,max=150,value=100,step=10),
@@ -29,6 +30,7 @@ ui <- shinyUI(fluidPage(
         )
       ),
       column(9,
+        # Output plots
          fluidRow(
           column(3,plotOutput("BioTot")),
           column(3,plotOutput("TotHarvest")),
