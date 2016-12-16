@@ -29,7 +29,11 @@ runSim <- function(sizelimit=F,size=100,compliance=1,
   TrawlCostPerF<-985861.6635
   
   #POLICY PARAMETER HERE-------------------------
+<<<<<<< HEAD
   BerriedPolicyCompliance<-0 #max is 1, 0 means no Berried Policy
+=======
+  #BerriedPolicyCompliance<-0 #max is 1, 0 means no Berried Policy
+>>>>>>> e86ab52849227ee771c3b762967397d9cffad100
   epsilon<-0.05 #for the open access scenario
   SizeLimit<- size #unit is mm
   SizeLimitCompliance<-compliance  #max is 1 (full compliance). 0 means no compliance

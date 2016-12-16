@@ -29,7 +29,11 @@ runSim <- function(sizelimit=F,size=100,compliance=1,
   TrawlCostPerF<-985861.6635
   
   #POLICY PARAMETER HERE-------------------------
+<<<<<<< HEAD
   BerriedPolicyCompliance<-0 #max is 1, 0 means no Berried Policy
+=======
+  #BerriedPolicyCompliance<-0 #max is 1, 0 means no Berried Policy
+>>>>>>> e86ab52849227ee771c3b762967397d9cffad100
   epsilon<-0.05 #for the open access scenario
   SizeLimit<- size #unit is mm
   SizeLimitCompliance<-compliance  #max is 1 (full compliance). 0 means no compliance
@@ -230,6 +234,19 @@ plotBioCW <- function(sim.out) {
 
 plotTotHarvest <- function(sim.out) {
   par(mar=c(4,4,2,0)+0.1)
+=======
+  plot(sim.out$Pop,xlab="Age (month)",ylab="Individuals")
+}
+
+plotBioAge <- function(sim.out) {
+  plot(sim.out$Pop*sim.out$data$weight/(1000*1000), xlab="Age (month)",ylab="Biomass (mt)")
+}
+
+plotBioCW <- function(sim.out) {
+  plot(sim.out$data$CW,sim.out$Pop*sim.out$data$weight/(1000*1000), xlab="CW (mm)",ylab="Biomass (mt)")
+}
+
+plotTotHarvest <- function(sim.out) {
   plot(-10:120,sim.out$TotHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Total Harvest",type="o")
 }
 
