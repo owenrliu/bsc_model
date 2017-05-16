@@ -3,10 +3,16 @@
 library(shiny)
 
 # load source model functions
-source(file="bsc_src_fxns.R")
+source(file="bsc_src_fxns_2.R")
 
 # Params
-paramNames <- c('sizelimit','size','compliance','trawlban','openTrap','openNet','openTrawl')
+paramNames <- c("PricePremium",
+                "TrawlBanCompliance", 
+                "SizeLCompliance",
+                "SIZELIMIT",
+                "SIZELIMITpolicy",
+                "TRAWLBANpolicy",
+                "OPENACCESSpolicy")
 
 # Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(
@@ -20,37 +26,38 @@ ui <- shinyUI(fluidPage(
       column(3,
         # Inputs
         wellPanel(
-          checkboxInput("sizelimit",label="Size Limit?",value=FALSE),
-          sliderInput("size",label="Size Limit (mm)",min=50,max=150,value=100,step=10),
-          sliderInput("compliance",label="Size Limit Compliance",min=0,max=1,value=1,step=0.1),
-          checkboxInput("trawlban",label="Trawl Ban",value=FALSE),
-          checkboxInput("openTrap",label="Trap Open Access",value=F),
-          checkboxInput("openNet",label="Gillnet Open Access",value=F),
-          checkboxInput("openTrawl",label="Trawl Open Access",value=F)
+          checkboxInput("SIZELIMITpolicy",label="Size Limit?",value=FALSE),
+          checkboxInput("PricePremium",label="Price Premium?",value=FALSE),
+          sliderInput("SIZELIMIT",label="Size Limit (mm)",min=50,max=150,value=100,step=10),
+          sliderInput("SizeLCompliance",label="Size Limit Compliance",min=0,max=1,value=1,step=0.1),
+          checkboxInput("TRAWLBANpolicy",label="Trawl Ban",value=FALSE),
+          sliderInput("TrawlBanCompliance",label="Trawl Ban Compliance",min=0,max=1,value=1,step=0.1),
+          checkboxInput("OPENACCESSpolicy",label="Open Access?",value=FALSE)
         )
       ),
       column(9,
-        # Output plots
-         fluidRow(
-          column(3,plotOutput("BioTot")),
-          column(3,plotOutput("TotHarvest")),
-          column(3,plotOutput("Effort"))
-         ),
-         fluidRow(
-          column(3,plotOutput("Ind")),
-          column(3,plotOutput("BioAge")),
-          column(3,plotOutput("BioCW"))
-         ),
-         fluidRow(
-          column(3,plotOutput("TrapHarvest")),
-          column(3,plotOutput("NetHarvest")),
-          column(3,plotOutput("TrawlHarvest"))
-         ),
-         fluidRow(
-          column(3,plotOutput("TrapProfit")),
-          column(3,plotOutput("NetProfit")),
-          column(3,plotOutput("TrawlProfit"))
-         )
+       plotOutput("allPlot")
+        # # Output plots
+        #  fluidRow(
+        #   column(3,plotOutput("BioTot")),
+        #   column(3,plotOutput("TotHarvest")),
+        #   column(3,plotOutput("Effort"))
+        #  ),
+        #  fluidRow(
+        #   column(3,plotOutput("Ind")),
+        #   column(3,plotOutput("BioAge")),
+        #   column(3,plotOutput("BioCW"))
+        #  ),
+        #  fluidRow(
+        #   column(3,plotOutput("TrapHarvest")),
+        #   column(3,plotOutput("NetHarvest")),
+        #   column(3,plotOutput("TrawlHarvest"))
+        #  ),
+        #  fluidRow(
+        #   column(3,plotOutput("TrapProfit")),
+        #   column(3,plotOutput("NetProfit")),
+        #   column(3,plotOutput("TrawlProfit"))
+        #  )
         )
       )
 ))
@@ -63,44 +70,44 @@ server <- shinyServer(function(input, output) {
     params
   }
   
-  simdat <- reactive(do.call(runSim,getParams()))
+  simdat <- reactive(do.call(BSCFUNCTION,getParams()))
    
-  output$BioTot <- renderPlot({
-    plotBioTot(simdat())
+  output$allPlot <- renderPlot({
+    plot_all(simdat())
   })
-  output$TotHarvest <- renderPlot({
-    plotTotHarvest(simdat())
-  })
-  output$BioAge <- renderPlot({
-    plotBioAge(simdat())
-  })
-  output$BioCW <- renderPlot({
-    plotBioCW(simdat())
-  })
-  output$Effort <- renderPlot({
-    plotEffort(simdat())
-  })
-  output$Ind <- renderPlot({
-    plotInd(simdat())
-  })
-  output$NetHarvest <- renderPlot({
-    plotNetHarvest(simdat())
-  })
-  output$NetProfit <- renderPlot({
-    plotNetProfit(simdat())
-  })
-  output$TrapHarvest <- renderPlot({
-    plotTrapHarvest(simdat())
-  })
-  output$TrapProfit <- renderPlot({
-    plotTrapProfit(simdat())
-  })
-  output$TrawlHarvest <- renderPlot({
-    plotTrawlHarvest(simdat())
-  })
-  output$TrawlProfit <- renderPlot({
-    plotTrawlProfit(simdat())
-  })
+  # output$TotHarvest <- renderPlot({
+  #   plotTotHarvest(simdat())
+  # })
+  # output$BioAge <- renderPlot({
+  #   plotBioAge(simdat())
+  # })
+  # output$BioCW <- renderPlot({
+  #   plotBioCW(simdat())
+  # })
+  # output$Effort <- renderPlot({
+  #   plotEffort(simdat())
+  # })
+  # output$Ind <- renderPlot({
+  #   plotInd(simdat())
+  # })
+  # output$NetHarvest <- renderPlot({
+  #   plotNetHarvest(simdat())
+  # })
+  # output$NetProfit <- renderPlot({
+  #   plotNetProfit(simdat())
+  # })
+  # output$TrapHarvest <- renderPlot({
+  #   plotTrapHarvest(simdat())
+  # })
+  # output$TrapProfit <- renderPlot({
+  #   plotTrapProfit(simdat())
+  # })
+  # output$TrawlHarvest <- renderPlot({
+  #   plotTrawlHarvest(simdat())
+  # })
+  # output$TrawlProfit <- renderPlot({
+  #   plotTrawlProfit(simdat())
+  # })
 })
 
 # Run the application 
