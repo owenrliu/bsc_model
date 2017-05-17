@@ -7,7 +7,8 @@ BSCFUNCTION<-function(BerriedPolicyCompliance=1,
                       SIZELIMIT=100,
                       SIZELIMITpolicy=TRUE,
                       TRAWLBANpolicy=TRUE,
-                      OPENACCESSpolicy=TRUE){
+                      OPENACCESSpolicy=TRUE,
+                      PLOTRESULTS=1){
   
   Nmat<-180 #number of months in age-structured model
   AdjustTime<- 12*200 #months to spin up the model (12 months times x years)
@@ -303,6 +304,7 @@ plot_all <- function(sim.out){
   # by time
   tvec <- -sim.out$leadT:sim.out$ProjectionTime
   simlength <- (length(sim.out$Biomass)-sim.out$leadT-sim.out$ProjectionTime):length(sim.out$Biomass)
+  TotBio <- sim.out$Biomass[simlength]
   TotHarvest <- sim.out$TotHarvest[simlength]
   TrapHarvest <- sim.out$TrapHarvest[simlength]
   NetHarvest <- sim.out$NetHarvest[simlength]
@@ -316,72 +318,80 @@ plot_all <- function(sim.out){
   EgnetVec <- sim.out$EgnetVec[simlength]
   EtrawlVec <- sim.out$EtrawlVec[simlength]
   
-  sim_results <- bind_cols(tvec,simlength,TotHarvest,TrapHarvest,
+  sim_results <- data_frame(tvec,simlength,TotHarvest,TrapHarvest,
                            NetHarvest,TrawlHarvest,TrapProfit,NetProfit,TrawlProfit,
-                           EtrapVEc,EgnetVec,EtrawlVec)
+                           EtrapVec,EgnetVec,EtrawlVec)
+  Pop <- as.numeric(sim.out$Pop)
+  BIOM <- as.numeric(sim.out$BIOM)
+  CW <- as.numeric(sim.out$CW)
+  AGE <- 1:length(Pop)
+  age_results <- data_frame(AGE,Pop,BIOM,CW)
 }
 
-plotBioTot <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-leadT:ProjectionTime,Biomass[(length(Biomass)-leadT-ProjectionTime):length(Biomass)], xlab="Time (month)",ylab="Biomass (mt)",main="Total Biomass",type="o")
-}
-
-plotInd <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(sim.out$Pop,xlab="Age (month)",main="Age Structure (ind.)",ylab="Individuals")
-}
-
-plotBioAge <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(sim.out$Pop*sim.out$data$weight/(1000*1000), xlab="Age (month)",
-       main="Age Structure (Biomass)",ylab="Biomass (mt)")
-}
-
-plotBioCW <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(sim.out$data$CW,sim.out$Pop*sim.out$data$weight/(1000*1000), xlab="CW (mm)",
-       main="Size Structure (Biomass)",ylab="Biomass (mt)")
-}
-
-plotTotHarvest <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$TotHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Total Harvest",type="o")
-}
-
-plotTrapHarvest <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$TrapHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Trap Harvest",type="o")
-}
-
-plotNetHarvest <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$NetHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Gillnet Harvest",type="o")
-}
-
-plotTrawlHarvest <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$TrawlHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Trawl Harvest",type="o")
-}
-
-plotTrapProfit <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$TrapProfit[231:361], xlab="Time (month)", ylab="Profit (USD)",main="Trap Profit",type="o")
-}
-
-plotNetProfit <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$NetProfit[231:361], xlab="Time (month)", ylab="Profit (USD)",main="Gillnet Profit",type="o")
-}
-
-plotTrawlProfit <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$TrawlProfit[231:361], xlab="Time (month)", ylab="Profit (USD)",main="Trawl Profit",type="o")
-}
-
-plotEffort <- function(sim.out) {
-  par(mar=c(4,4,2,1)+0.1)
-  plot(-10:120,sim.out$EtrapVec[231:361], xlab="Time (month)", ylab="Effort",main="Effort",
-       ylim=c(0,max(sim.out$EtrapVec,sim.out$EgnetVec,sim.out$EtrawlVec)),type="o")
-  points(-10:120,sim.out$EgnetVec[231:361], xlab="Time (month)", col="red",type="o")
-  points(-10:120,sim.out$EtrawlVec[231:361], xlab="Time (month)", col="blue",type="o")  
-}
+# plotBioTot <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-leadT:ProjectionTime,Biomass[(length(Biomass)-leadT-ProjectionTime):length(Biomass)], xlab="Time (month)",ylab="Biomass (mt)",main="Total Biomass",type="o")
+# }
+# 
+# plotInd <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(sim.out$Pop,xlab="Age (month)",main="Age Structure (ind.)",ylab="Individuals")
+# }
+# 
+# plotBioAge <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(sim.out$Pop*sim.out$data$weight/(1000*1000), xlab="Age (month)",
+#        main="Age Structure (Biomass)",ylab="Biomass (mt)")
+# }
+# 
+# plotBioCW <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(sim.out$data$CW,sim.out$Pop*sim.out$data$weight/(1000*1000), xlab="CW (mm)",
+#        main="Size Structure (Biomass)",ylab="Biomass (mt)")
+# }
+# 
+# plotTotHarvest <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$TotHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Total Harvest",type="o")
+# }
+# 
+# plotTrapHarvest <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$TrapHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Trap Harvest",type="o")
+# }
+# 
+# plotNetHarvest <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$NetHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Gillnet Harvest",type="o")
+# }
+# 
+# plotTrawlHarvest <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$TrawlHarvest[231:361], xlab="Time (month)", ylab="Harvest (mt)",main="Trawl Harvest",type="o")
+# }
+# 
+# plotTrapProfit <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$TrapProfit[231:361], xlab="Time (month)", ylab="Profit (USD)",main="Trap Profit",type="o")
+# }
+# 
+# plotNetProfit <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$NetProfit[231:361], xlab="Time (month)", ylab="Profit (USD)",main="Gillnet Profit",type="o")
+# }
+# 
+# plotTrawlProfit <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$TrawlProfit[231:361], xlab="Time (month)", ylab="Profit (USD)",main="Trawl Profit",type="o")
+# }
+# 
+# plotEffort <- function(sim.out) {
+#   par(mar=c(4,4,2,1)+0.1)
+#   plot(-10:120,sim.out$EtrapVec[231:361], xlab="Time (month)", ylab="Effort",main="Effort",
+#        ylim=c(0,max(sim.out$EtrapVec,sim.out$EgnetVec,sim.out$EtrawlVec)),type="o")
+#   points(-10:120,sim.out$EgnetVec[231:361], xlab="Time (month)", col="red",type="o")
+#   points(-10:120,sim.out$EtrawlVec[231:361], xlab="Time (month)", col="blue",type="o")  
+# }
+#CHECKER
+Efforts<-c(0.0301,0.00793,0.0038)
+sim.out<-BSCFUNCTION(BerriedPolicyCompliance=0,PricePremium=T,TrawlBanCompliance=1, SizeLCompliance=1, Efforts,PLOTRESULTS=1,SIZELIMIT=100,SIZELIMITpolicy=T,TRAWLBANpolicy=T,OPENACCESSpolicy=T)
