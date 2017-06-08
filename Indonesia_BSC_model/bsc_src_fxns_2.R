@@ -275,26 +275,61 @@ BSCFUNCTION<-function(BerriedPolicyCompliance=0,
   
 }
 
-#### Baseline scenario (default params) ####
-baseline <- BSCFUNCTION()
-tvec <- -baseline$leadT:baseline$ProjectionTime
-simlength <- (length(baseline$Biomass)-baseline$leadT-baseline$ProjectionTime):length(baseline$Biomass)
-TotBio <- baseline$Biomass[simlength]
-TotHarvest <- baseline$TotHarvest[simlength]
-TrapHarvest <- baseline$TrapHarvest[simlength]
-NetHarvest <- baseline$NetHarvest[simlength]
-TrawlHarvest <- baseline$TrawlHarvest[simlength]
+#### calculate baseline scenario (default params) ####
+base_open <- BSCFUNCTION(OPENACCESSpolicy = TRUE)
+tvec <- -base_open$leadT:base_open$ProjectionTime
+simlength <- (length(base_open$Biomass)-base_open$leadT-base_open$ProjectionTime):length(base_open$Biomass)
+TotBio <- base_open$Biomass[simlength]
+TotHarvest <- base_open$TotHarvest[simlength]
+TrapHarvest <- base_open$TrapHarvest[simlength]
+NetHarvest <- base_open$NetHarvest[simlength]
+TrawlHarvest <- base_open$TrawlHarvest[simlength]
 
-TrapProfit <- baseline$TrapProfit[simlength]
-NetProfit <- baseline$NetProfit[simlength]
-TrawlProfit <- baseline$TrawlProfit[simlength]
+TrapProfit <- base_open$TrapProfit[simlength]
+NetProfit <- base_open$NetProfit[simlength]
+TrawlProfit <- base_open$TrawlProfit[simlength]
 
-EtrapVec <- baseline$EtrapVec[simlength]
-EgnetVec <- baseline$EgnetVec[simlength]
-EtrawlVec <- baseline$EtrawlVec[simlength]
+EtrapVec <- base_open$EtrapVec[simlength]
+EgnetVec <- base_open$EgnetVec[simlength]
+EtrawlVec <- base_open$EtrawlVec[simlength]
 
 base_sim_results <- data_frame(tvec,simlength,TotBio,TotHarvest,TrapHarvest,
                           NetHarvest,TrawlHarvest,TrapProfit,NetProfit,TrawlProfit) %>%
+  mutate(sim="baseOpen")
+
+base_eff_results <- data_frame(tvec,Trap=EtrapVec,Gillnet=EgnetVec,Trawl=EtrawlVec)%>%
+  mutate(sim="baseOpen")
+base_eff_results <- base_eff_results %>% gather("gear","value",Trap:Trawl)%>%
+  mutate(sim="baseOpen")
+
+#by age
+Pop <- as.numeric(base_open$Pop)
+BIOM <- as.numeric(base_open$BIOM)
+CW <- as.numeric(base_open$CW)
+AGE <- 1:length(Pop)
+base_open_age_results <- data_frame(AGE,Pop,BIOM,CW)%>%
+  mutate(sim="baseOpen")
+
+### second baseline (constant effort)
+base_const <- BSCFUNCTION()
+tvec <- -base_const$leadT:base_const$ProjectionTime
+simlength <- (length(base_const$Biomass)-base_const$leadT-base_const$ProjectionTime):length(base_const$Biomass)
+TotBio <- base_const$Biomass[simlength]
+TotHarvest <- base_const$TotHarvest[simlength]
+TrapHarvest <- base_const$TrapHarvest[simlength]
+NetHarvest <- base_const$NetHarvest[simlength]
+TrawlHarvest <- base_const$TrawlHarvest[simlength]
+
+TrapProfit <- base_const$TrapProfit[simlength]
+NetProfit <- base_const$NetProfit[simlength]
+TrawlProfit <- base_const$TrawlProfit[simlength]
+
+EtrapVec <- base_const$EtrapVec[simlength]
+EgnetVec <- base_const$EgnetVec[simlength]
+EtrawlVec <- base_const$EtrawlVec[simlength]
+
+base_sim_results <- data_frame(tvec,simlength,TotBio,TotHarvest,TrapHarvest,
+                               NetHarvest,TrawlHarvest,TrapProfit,NetProfit,TrawlProfit) %>%
   mutate(sim="base")
 
 base_eff_results <- data_frame(tvec,Trap=EtrapVec,Gillnet=EgnetVec,Trawl=EtrawlVec)%>%
@@ -303,9 +338,9 @@ base_eff_results <- base_eff_results %>% gather("gear","value",Trap:Trawl)%>%
   mutate(sim="base")
 
 #by age
-Pop <- as.numeric(baseline$Pop)
-BIOM <- as.numeric(baseline$BIOM)
-CW <- as.numeric(baseline$CW)
+Pop <- as.numeric(base_const$Pop)
+BIOM <- as.numeric(base_const$BIOM)
+CW <- as.numeric(base_const$CW)
 AGE <- 1:length(Pop)
 base_age_results <- data_frame(AGE,Pop,BIOM,CW)%>%
   mutate(sim="base")
